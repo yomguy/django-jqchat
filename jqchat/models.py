@@ -124,8 +124,8 @@ class Message(models.Model):
 
     Events:
     >>> m1 = Message.objects.create_event(user, room, 1)
-    >>> m1.text
-    u'<strong>john</strong> <em>has changed the description of the lobby.</em><br />'
+    >>> u'<strong>john</strong> <em>has changed' in m1.text
+    True
 
     Note that there are 2 timestamp fields:
     - a unix timestamp.
