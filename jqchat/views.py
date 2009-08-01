@@ -8,6 +8,12 @@ from models import Room, Message
 
 import time
 
+# The format of the date displayed in the chat window can be customised.
+try:
+    DATE_FORMAT = settings.JQCHAT_DATE_FORMAT
+except:
+    # Use default format.
+    DATE_FORMAT = "H:i:s"
 
 #------------------------------------------------------------------------------
 @login_required
@@ -114,6 +120,7 @@ class Ajax(object):
                                        'NewDescription': NewDescription,
                                        'user_tz': user_tz,
                                        'CustomPayload': CustomPayload,
+                                       'TimeDisplayFormat': DATE_FORMAT
                                        },
                                       context_instance=RequestContext(self.request))
             response['Content-Type'] = 'text/plain; charset=utf-8'

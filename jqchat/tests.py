@@ -7,9 +7,14 @@ Unit tests for jqchat application.
 from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
+#from django.conf import settings
 
 import simplejson
 from models import Room, Message
+
+# During testing we want to use default settings.
+import views
+views.DATE_FORMAT = "H:i:s"
 
 class ChatPageTest(TestCase):
     """Test the chat test page."""
@@ -49,7 +54,7 @@ class AJAXGetTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.client.login(username='mickey', password='test')
-
+        
     def test_get_messages(self):
         """Get the latest messages."""
 
