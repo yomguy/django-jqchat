@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
 from django.utils.safestring import mark_safe
 from django.conf import settings
 
@@ -37,6 +39,10 @@ class Room(models.Model):
     description_modified = models.IntegerField(null=True, editable=False, help_text='Unix timestamp when the description was created or last modified.')
     last_activity = models.IntegerField(editable=False,
                                         help_text='Last activity in the room. Stored as a Unix timestamp.')
+    # Define generic relation to target object. This is optional.
+    content_type = models.ForeignKey(ContentType, blank=True, null=True)
+    object_id = models.PositiveIntegerField(blank=True, null=True)
+    content_object = generic.GenericForeignKey()
 
     def __unicode__(self):
         return u'%s' % (self.name)
@@ -119,7 +125,7 @@ class Message(models.Model):
     Events:
     >>> m1 = Message.objects.create_event(user, room, 1)
     >>> m1.text
-    u"<strong>john</strong> <em>has changed the room's description.</em><br />"
+    u'<strong>john</strong> <em>has changed the description of the lobby.</em><br />'
 
     Note that there are 2 timestamp fields:
     - a unix timestamp.
