@@ -15,6 +15,9 @@ except:
     # Use default format.
     DATE_FORMAT = "H:i:s"
 
+# How many messages to retrieve at most.
+JQCHAT_DISPLAY_COUNT = getattr(settings, 'JQCHAT_DISPLAY_COUNT', 100) 
+
 #------------------------------------------------------------------------------
 @login_required
 def window(request, id):
@@ -112,6 +115,11 @@ class Ajax(object):
             NewMessages = self.ThisRoom.message_set.filter(unix_timestamp__gt=self.request_time)
             if NewMessages:
                 StatusCode = 1
+
+            # Only keep the last X messages.
+            l = len(NewMessages)
+            if l > JQCHAT_DISPLAY_COUNT:
+                NewMessages = NewMessages[l-JQCHAT_DISPLAY_COUNT:]
         
             response =  render_to_response('jqchat/chat_payload.json',
                                       {'current_unix_timestamp': int(time.time()),
