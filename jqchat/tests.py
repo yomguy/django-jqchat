@@ -201,6 +201,20 @@ class AJAXPostTest(TestCase):
         # No messages added to the 4 already defined.
         self.assert_(len(messages) == 4)
 
+    def test_XSS(self):
+        """Check that chat is protected against cross-site scripting (by disabling html tags)."""
+
+        response = self.client.post('/jqchat/room/1/ajax/', {'time': 0,
+                                                         'action': 'postmsg',
+                                                         'message': '<script>alert("boo!");</script>'})
+        self.assert_(response.status_code == 200, response.status_code)
+
+        payload = simplejson.loads(response.content)
+        messages = payload['messages']
+        self.assert_('&lt;script&gt;' in messages[-1]['text'])
+        self.assert_('<script>' not in messages[-1]['text'])
+
+
 class EventTest(TestCase):
     """Create new events in the room."""
 

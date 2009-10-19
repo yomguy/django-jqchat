@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.utils.html import escape
 
 from models import Room, Message
 
@@ -93,7 +94,7 @@ class Ajax(object):
                     msg_text = self.request.POST['message']
         
                     if len(msg_text.strip()) > 0: # Ignore empty strings.
-                        Message.objects.create_message(self.request.user, self.ThisRoom, msg_text)
+                        Message.objects.create_message(self.request.user, self.ThisRoom, escape(msg_text))
             else:
                 # If a GET, make sure that no action was specified.
                 if self.request.GET.get('action', None):
