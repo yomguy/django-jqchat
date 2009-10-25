@@ -164,7 +164,8 @@ class DescriptionAjax(Ajax):
         if self.request.method == "POST":
             action = self.request.POST['action']
             if action == 'change_description':
-                self.ThisRoom.description = self.request.POST['description']
+                # Note that we escape descriptions as a protection against XSS.
+                self.ThisRoom.description = escape(self.request.POST['description'])
                 self.ThisRoom.save()
                 Message.objects.create_event(self.request.user, self.ThisRoom, 1)
         # Is there a description more recent than the timestamp sent by the client?

@@ -303,6 +303,16 @@ class DescriptionTest(TestCase):
         self.assert_(r.last_activity > 0, r.last_activity)
 
 
+    def test_XSS(self):
+        """Check that chat is protected against cross-site scripting (by disabling html tags)."""
+
+        response = self.client.post('/jqchat/room_with_description/2/ajax/', {'time': 0,
+                                                                            'action': 'change_description',
+                                                                            'description': '<script>alert("boo!");</script>'})
+        self.assert_(response.status_code == 200, response.status_code)
+        payload = simplejson.loads(response.content)
+        self.assert_(payload['description'] == '&lt;script&gt;alert(&quot;boo!&quot;);&lt;/script&gt;', payload)
+
 
 
 
