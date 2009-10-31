@@ -76,68 +76,64 @@ class Ajax(object):
     # Instead they have to be attached to child classes.
     def __call__(self, request, id):
 
-        try:
-            if not request.user.is_authenticated():
-                return HttpResponseBadRequest('You need to be logged in to access the chat system.')
-        
-            StatusCode = 0 # Default status code is 0 i.e. no new data.
-            self.request = request
-            self.request_time = int(self.request.REQUEST['time'])
-            self.ThisRoom = Room.objects.get(id=id)
-            NewDescription = None
+        if not request.user.is_authenticated():
+            return HttpResponseBadRequest('You need to be logged in to access the chat system.')
     
-            if self.request.method == "POST":
-                # User has sent new data.
-                action = self.request.POST['action']
-        
-                if action == 'postmsg':
-                    msg_text = self.request.POST['message']
-        
-                    if len(msg_text.strip()) > 0: # Ignore empty strings.
-                        Message.objects.create_message(self.request.user, self.ThisRoom, escape(msg_text))
-            else:
-                # If a GET, make sure that no action was specified.
-                if self.request.GET.get('action', None):
-                    return HttpResponseBadRequest('Need to POST if you want to send data.')
-    
-            # If using Pinax we can get the user's timezone.
-            try:
-                user_tz = self.request.user.account_set.all()[0].timezone
-            except:
-                user_tz = settings.TIME_ZONE
-        
-            # Extra JSON string to be spliced into the response.
-            CustomPayload = self.ExtraHandling()
-            if CustomPayload:
-                StatusCode = 1
-        
-            # Get new messages - do this last in case the ExtraHandling has itself generated
-            # new messages. 
-            NewMessages = self.ThisRoom.message_set.filter(unix_timestamp__gt=self.request_time)
-            if NewMessages:
-                StatusCode = 1
+        StatusCode = 0 # Default status code is 0 i.e. no new data.
+        self.request = request
+        self.request_time = int(self.request.REQUEST['time'])
+        self.ThisRoom = Room.objects.get(id=id)
+        NewDescription = None
 
-            # Only keep the last X messages.
-            l = len(NewMessages)
-            if l > JQCHAT_DISPLAY_COUNT:
-                NewMessages = NewMessages[l-JQCHAT_DISPLAY_COUNT:]
-        
-            response =  render_to_response('jqchat/chat_payload.json',
-                                      {'current_unix_timestamp': int(time.time()),
-                                       'NewMessages': NewMessages,
-                                       'StatusCode': StatusCode,
-                                       'NewDescription': NewDescription,
-                                       'user_tz': user_tz,
-                                       'CustomPayload': CustomPayload,
-                                       'TimeDisplayFormat': DATE_FORMAT
-                                       },
-                                      context_instance=RequestContext(self.request))
-            response['Content-Type'] = 'text/plain; charset=utf-8'
-            response['Cache-Control'] = 'no-cache'
-            return response
+        if self.request.method == "POST":
+            # User has sent new data.
+            action = self.request.POST['action']
+    
+            if action == 'postmsg':
+                msg_text = self.request.POST['message']
+    
+                if len(msg_text.strip()) > 0: # Ignore empty strings.
+                    Message.objects.create_message(self.request.user, self.ThisRoom, escape(msg_text))
+        else:
+            # If a GET, make sure that no action was specified.
+            if self.request.GET.get('action', None):
+                return HttpResponseBadRequest('Need to POST if you want to send data.')
+
+        # If using Pinax we can get the user's timezone.
+        try:
+            user_tz = self.request.user.account_set.all()[0].timezone
         except:
-            import traceback
-            print traceback.format_exc()
+            user_tz = settings.TIME_ZONE
+    
+        # Extra JSON string to be spliced into the response.
+        CustomPayload = self.ExtraHandling()
+        if CustomPayload:
+            StatusCode = 1
+    
+        # Get new messages - do this last in case the ExtraHandling has itself generated
+        # new messages. 
+        NewMessages = self.ThisRoom.message_set.filter(unix_timestamp__gt=self.request_time)
+        if NewMessages:
+            StatusCode = 1
+
+        # Only keep the last X messages.
+        l = len(NewMessages)
+        if l > JQCHAT_DISPLAY_COUNT:
+            NewMessages = NewMessages[l-JQCHAT_DISPLAY_COUNT:]
+    
+        response =  render_to_response('jqchat/chat_payload.json',
+                                  {'current_unix_timestamp': int(time.time()),
+                                   'NewMessages': NewMessages,
+                                   'StatusCode': StatusCode,
+                                   'NewDescription': NewDescription,
+                                   'user_tz': user_tz,
+                                   'CustomPayload': CustomPayload,
+                                   'TimeDisplayFormat': DATE_FORMAT
+                                   },
+                                  context_instance=RequestContext(self.request))
+        response['Content-Type'] = 'text/plain; charset=utf-8'
+        response['Cache-Control'] = 'no-cache'
+        return response
 
     def ExtraHandling(self):
         """We might want to receive/send extra data in the Ajax calls.
