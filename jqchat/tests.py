@@ -124,6 +124,12 @@ class AJAXGetTest(TestCase):
         messages = payload['messages']
         self.assert_(len(messages) == 0)
 
+    def test_no_time(self):
+        """All requests should include the time."""
+
+        response = self.client.get('/jqchat/room/1/ajax/')
+        self.assert_(response.status_code == 400, response.status_code)
+
     def test_room_2(self):
         """Retrieve messages for room 2 - should be a different list to room 1.
         Additionally, set the time so as to retrieve only the latest 2 messages in that room -
@@ -185,6 +191,13 @@ class AJAXPostTest(TestCase):
 
         response = self.client.get('/jqchat/room/1/ajax/', {'time': 0,
                                                          'action': 'postmsg',
+                                                         'message': 'rhubarb'})
+        self.assert_(response.status_code == 400, response.status_code)
+
+    def test_no_time(self):
+        """All requests should include the time."""
+
+        response = self.client.get('/jqchat/room/1/ajax/', {'action': 'postmsg',
                                                          'message': 'rhubarb'})
         self.assert_(response.status_code == 400, response.status_code)
 

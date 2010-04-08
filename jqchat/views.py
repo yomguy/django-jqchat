@@ -81,7 +81,10 @@ class Ajax(object):
     
         StatusCode = 0 # Default status code is 0 i.e. no new data.
         self.request = request
-        self.request_time = int(self.request.REQUEST['time'])
+        try:
+            self.request_time = int(self.request.REQUEST['time'])
+        except:
+            return HttpResponseBadRequest("What's the time?")
         self.ThisRoom = Room.objects.get(id=id)
         NewDescription = None
 
