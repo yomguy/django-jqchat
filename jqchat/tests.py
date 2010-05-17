@@ -71,12 +71,12 @@ class AJAXGetTest(TestCase):
         # Should have a status of 1 (there are new messages).
         self.assert_(payload['status'] == 1, payload)
 
-        # The server returns the Unix time, this will be an integer > 0.
+        # The server returns the Unix time, this will be a number > 0.
         t = payload['time']
         try:
-            t = int(t)
+            t = float(t)
         except:
-            self.assert_(False, 'Time (%s) should be an integer.' % t)
+            self.assert_(False, 'Time (%s) should be a number.' % t)
 
         messages = payload['messages']
 
@@ -227,6 +227,74 @@ class AJAXPostTest(TestCase):
         self.assert_('&lt;script&gt;' in messages[-1]['text'])
         self.assert_('<script>' not in messages[-1]['text'])
 
+class BehaviourTest(TestCase):
+    """Check out how the chat window behaves in different scenarios."""
+
+    fixtures = ['test_jqchat.json']
+
+    def setUp(self):
+        self.client = Client()
+        self.client.login(username='mickey', password='test')
+
+        self.client2 = Client()
+        self.client2.login(username='donald', password='test')
+
+    def test_simultaneous_messages(self):
+        """Ensure that messages sent by different users at (virtually) the same time are picked up."""
+
+        response = self.client.post('/jqchat/room/1/ajax/', {'time': 0,
+                                                         'action': 'postmsg',
+                                                         'message': 'rhubarb'})
+        self.assert_(response.status_code == 200, response.status_code)
+
+        payload = simplejson.loads(response.content)
+        # Should have a status of 1 (there are new messages).
+        self.assert_(payload['status'] == 1, payload)
+
+        mickey_time = payload['time']
+        messages = payload['messages']
+
+        self.assert_(len(messages) == 5)
+        self.assert_('mickey' in messages[-1]['text'])
+        self.assert_('rhubarb' in messages[-1]['text'])
+
+        # Donald also sends a message, at virtually the same time.
+        response = self.client2.post('/jqchat/room/1/ajax/', {'time': 0,
+                                                         'action': 'postmsg',
+                                                         'message': 'crumble'})
+        self.assert_(response.status_code == 200, response.status_code)
+
+        payload = simplejson.loads(response.content)
+        # Should have a status of 1 (there are new messages).
+        self.assert_(payload['status'] == 1, payload)
+
+        messages = payload['messages']
+
+        # Will pick up the message by Mickey, as well as the one just posted by Donald.
+        self.assert_(len(messages) == 6, messages)
+        self.assert_('donald' in messages[-1]['text'])
+        self.assert_('crumble' in messages[-1]['text'])
+
+        # And the next to last message is the one by Mickey.
+        self.assert_('mickey' in messages[-2]['text'])
+        self.assert_('rhubarb' in messages[-2]['text'])
+
+        # Mickey immediately requests the latest messages (it could happen...).
+        # Note how the time is no longer 0 - it's whatever time was returned from the 
+        # last AJAX query.
+        response = self.client.get('/jqchat/room/1/ajax/', {'time': mickey_time})
+        self.assert_(response.status_code == 200, response.status_code)
+
+        payload = simplejson.loads(response.content)
+        # Should have a status of 1 (there are new messages).
+        self.assert_(payload['status'] == 1, payload)
+
+        messages = payload['messages']
+
+        # Since Mickey last checked, there has been one message posted by Donald.
+        self.assert_(len(messages) == 1, messages)
+        self.assert_('donald' in messages[-1]['text'])
+        self.assert_('crumble' in messages[-1]['text'])
 
 class EventTest(TestCase):
     """Create new events in the room."""

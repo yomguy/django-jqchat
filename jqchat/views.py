@@ -82,7 +82,7 @@ class Ajax(object):
         StatusCode = 0 # Default status code is 0 i.e. no new data.
         self.request = request
         try:
-            self.request_time = int(self.request.REQUEST['time'])
+            self.request_time = float(self.request.REQUEST['time'])
         except:
             return HttpResponseBadRequest("What's the time?")
         self.ThisRoom = Room.objects.get(id=id)
@@ -123,9 +123,9 @@ class Ajax(object):
         l = len(NewMessages)
         if l > JQCHAT_DISPLAY_COUNT:
             NewMessages = NewMessages[l-JQCHAT_DISPLAY_COUNT:]
-    
+            
         response =  render_to_response('jqchat/chat_payload.json',
-                                  {'current_unix_timestamp': int(time.time()),
+                                  {'current_unix_timestamp': time.time(),
                                    'NewMessages': NewMessages,
                                    'StatusCode': StatusCode,
                                    'NewDescription': NewDescription,
