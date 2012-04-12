@@ -1,7 +1,9 @@
 {% load timezone_filters %}
+{% load l10n %}
+
 {
 	"status": {{ StatusCode }},
-	"time": {{ current_unix_timestamp }},
+	"time": {% localize off %}{{ current_unix_timestamp }}{% endlocalize %},
 {% if NewDescription %}	"description": {{ NewDescription }},{% endif %}
 	"messages": [
 {% for row in NewMessages %}{# The localtime filter is part of Django timezone and adjusts a datetime to the given timezone #}
