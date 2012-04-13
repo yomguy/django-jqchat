@@ -87,7 +87,7 @@ except:
                   (3, "has left the room."),
                  )
 class messageManager(models.Manager):
-    
+
     def create_message(self, user, room, msg):
         """Create a message for the given user."""
         m = Message.objects.create(user=user,
@@ -111,10 +111,10 @@ class Message(models.Model):
     - a text typed in by the user.
     - an event carried out in the room ("user X has left the room.").
 
-    New messages should be created through the supplied manager methods, as all 
+    New messages should be created through the supplied manager methods, as all
     messages get preformatted (added markup) for display in the chat window.
     For example:
-    
+
     Messages:
     >>> user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
     >>> room = Room.objects.create(name='Test room')

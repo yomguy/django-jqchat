@@ -6,7 +6,7 @@ from django.contrib import admin
 class RoomAdmin(admin.ModelAdmin):
     list_display = ('name', 'created', 'last_activity_formatted', 'description', 'description_modified')
     readonly_fields = ('created', 'description_modified', 'content_type', 'object_id')
-    # As we've set some fields to be read-only, they will automatically appear at the end 
+    # As we've set some fields to be read-only, they will automatically appear at the end
     # of the list. Manually order the fields to be as they are defined in the model.
     fieldsets = (
         (None, {
