@@ -100,7 +100,7 @@ class messageManager(models.Manager):
         m = Message(user=user,
                     room=room,
                     event=event_id)
-        m.text = "<strong>%s</strong> <em>%s</em><br />" % (user, m.get_event_display())
+        m.text = '<strong>%s</strong> <em>%s</em><br />' % (user, m.get_event_display())
         m.save()
         return m
 

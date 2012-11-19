@@ -1,3 +1,4 @@
+
 //Handles the csrf_token for ajax posts, taken from:
 // https://docs.djangoproject.com/en/dev/ref/contrib/csrf/
 
@@ -39,6 +40,17 @@ $(document).ajaxSend(function(event, xhr, settings) {
 });
 
 
+jQuery.fn.urlize = function( base ) {
+    var x = this.html();
+    list = x.match( /\b(http:\/\/|www\.|http:\/\/www\.)[^ ]{2,100}\b/g );
+    if ( list ) {
+        for ( i = 0; i < list.length; i++ ) {
+            x = x.replace( list[i], "<a href='" + base + escape( list[i] ) + "'>"+ list[i] + "</a>" );
+        }
+        this.html(x);
+    }
+};
+
 // Chat client code.
 
 
@@ -73,7 +85,7 @@ function processResponse(payload) {
 	// Get the timestamp, store it in global variable to be passed to the server on next call.
 	timestamp = payload.time;
 	for(message in payload.messages) {
-		$("#chatwindow").append(payload.messages[message].text);
+		$("#chatwindow").append(payload.messages[message].text).urlize( "/" );
 	}
 	// Scroll down if messages fill up the div.
 	var objDiv = document.getElementById("chatwindow");

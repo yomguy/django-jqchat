@@ -14,7 +14,7 @@ try:
     DATE_FORMAT = settings.JQCHAT_DATE_FORMAT
 except:
     # Use default format.
-    DATE_FORMAT = "H:i:s"
+    DATE_FORMAT = "D-H:i:s"
 
 # How many messages to retrieve at most.
 JQCHAT_DISPLAY_COUNT = getattr(settings, 'JQCHAT_DISPLAY_COUNT', 100) 
