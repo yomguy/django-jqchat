@@ -5,6 +5,8 @@ Dependencies
 * django-timezones
 * pytz (used by django-timezones).
 
+These should be installed automatically.
+
 ####################
 Installation
 ####################
@@ -17,12 +19,20 @@ install::
     pip install -e git://github.com/tomscytale/django-jqchat.git#egg=django-jqchat
   
 * add ``jqchat`` and ``timezones`` to the project's list of applications.
-* include jqchat's ``urls.py`` to your main ``urls.py`` file.
-* run a ``syncdb`` to add new tables.
+* include jqchat's ``urls.py`` to your main ``urls.py`` file::
 
-test it. By default the urls.py file supplied adds 2 types of chat
-test rooms, you will have to manually create one in the admin before
-you can test it.
+        url(r'^chat/', include('jqchat.urls'))
+
+* run a ``syncdb`` to add new tables.
+* add a chat room via the admin - http://yoursite.com/admin/jqchat/room/
+* you need templates - some test templates are supplied with jqchat -
+  with minor modifications they can be used - they inherit from
+  ``site_base.html`` and the block names will probably not match those
+  use in your base template.
+* go to http://yoursite.com/chat/room/1/
+
+By default the urls.py file supplied adds 2 types of chat
+test rooms.
 
 ####################
 Design philosophy
