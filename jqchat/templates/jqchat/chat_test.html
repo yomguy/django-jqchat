@@ -26,13 +26,7 @@
 
 <h2>Room name: {{ room }}</h2>
 
-<div id="chatwindow"><span id="loading">Loading...</span></div>
-
-<form id="chatform">
-	<label for="msg">Message:</label>
-	<input type="text" id="msg" />
-	<input type="submit" value="Send message" /><br />
-</form>
+{% include 'jqchat/_chat_form.html' %}
 
 <script type="text/javascript">document.getElementById("msg").focus();</script>
 

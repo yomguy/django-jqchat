@@ -33,13 +33,7 @@
 <h2>Room name: {{ room }}</h2>
 <h2>Room description: <span id="chatroom_description"></span></h2>
 
-<div id="chatwindow"><span id="loading">Loading...</span></div>
-
-<form id="chatform">
-	<label for="msg">Message:</label>
-	<input type="text" id="msg" />
-	<input type="submit" value="Send message" /><br />
-</form>
+{% include 'jqchat/_chat_form.html' %}
 
 <form id="chatroom_description_form" method="post" action="">
 	<label for="id_description">Room description:</label>
