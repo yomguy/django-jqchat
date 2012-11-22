@@ -7,8 +7,9 @@ setup(
     version=".".join(map(str, jqchat.VERSION)),
     url="https://github.com/tomscytale/django-jqchat",
     install_requires=[
+        'Django>=1.0',
         'django-timezones',
-        'pytz'
+        'pytz',
         ],
     description='An extensible instant messanger thingy for Django',
     packages=find_packages(),
