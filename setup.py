@@ -1,8 +1,10 @@
 from setuptools import setup, find_packages
 
+import jqchat
+
 setup(
     name='django-jqchat',
-    version="0.1",
+    version=".".join(map(str, jqchat.VERSION)),
     url="https://github.com/tomscytale/django-jqchat",
     install_requires=[
         'django-timezones',
