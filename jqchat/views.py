@@ -105,7 +105,7 @@ class Ajax(object):
         # If using Pinax we can get the user's timezone.
         try:
             user_tz = self.request.user.account_set.all()[0].timezone
-        except AttributeError:
+        except (AttributeError, IndexError):
             user_tz = settings.TIME_ZONE
 
         # Extra JSON string to be spliced into the response.
