@@ -47,9 +47,12 @@ Integration
 The easiest way to add a jqchat room to an existing model is to create
 a OneToOne field on the existing model. For example::
   
-            from myapp.models import Room
-            chat_room = models.OneToOneField(Room, help_text='Chat
-            room to be used for this lobby.')
+            from django.db import models
+            from jqchat.models import Room
+
+            class MyModel(models.Model):
+                name = models.CharField(max_length=20)
+                chat_room = models.OneToOneField(Room)
 
 In the jqchat templates folder you will find
 chat_test.html; you will have to pull out some code and
