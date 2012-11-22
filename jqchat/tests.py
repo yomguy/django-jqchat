@@ -55,7 +55,7 @@ class AJAXGetTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.client.login(username='mickey', password='test')
-        
+
     def test_get_messages(self):
         """Get the latest messages."""
 
@@ -281,7 +281,7 @@ class BehaviourTest(TestCase):
         self.assert_('rhubarb' in messages[-2]['text'])
 
         # Mickey immediately requests the latest messages (it could happen...).
-        # Note how the time is no longer 0 - it's whatever time was returned from the 
+        # Note how the time is no longer 0 - it's whatever time was returned from the
         # last AJAX query.
         response = self.client.get(reverse('jqchat_ajax', kwargs={'id': 1}), {'time': mickey_time})
         self.assert_(response.status_code == 200, response.status_code)
@@ -314,7 +314,7 @@ class EventTest(TestCase):
         u = User.objects.get(username='mickey')
         r = Room.objects.get(id=1)
         Message.objects.create_event(u, r, 3)
-        
+
         response = self.client.get(reverse('jqchat_ajax', kwargs={'id': 1}), {'time': 1227629906})
 
         self.assert_(response.status_code == 200, response.status_code)
@@ -337,7 +337,7 @@ class EventTest(TestCase):
 
 class DescriptionTest(TestCase):
     """Get and update the description field.
-    The description is only in the second test chat window, and is a demo of how to extend 
+    The description is only in the second test chat window, and is a demo of how to extend
     the chat system.
     """
 
