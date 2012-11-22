@@ -83,7 +83,7 @@ class Ajax(object):
         self.request = request
         try:
             self.request_time = float(self.request.REQUEST['time'])
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, KeyError):
             return HttpResponseBadRequest("What's the time?")
         self.ThisRoom = Room.objects.get(id=id)
         NewDescription = None
