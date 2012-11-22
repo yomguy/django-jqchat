@@ -12,7 +12,7 @@ import time
 # The format of the date displayed in the chat window can be customised.
 try:
     DATE_FORMAT = settings.JQCHAT_DATE_FORMAT
-except:
+except AttributeError:
     # Use default format.
     DATE_FORMAT = "D-H:i:s"
 
@@ -83,7 +83,7 @@ class Ajax(object):
         self.request = request
         try:
             self.request_time = float(self.request.REQUEST['time'])
-        except:
+        except (ValueError, TypeError):
             return HttpResponseBadRequest("What's the time?")
         self.ThisRoom = Room.objects.get(id=id)
         NewDescription = None
@@ -105,7 +105,7 @@ class Ajax(object):
         # If using Pinax we can get the user's timezone.
         try:
             user_tz = self.request.user.account_set.all()[0].timezone
-        except:
+        except AttributeError:
             user_tz = settings.TIME_ZONE
 
         # Extra JSON string to be spliced into the response.
