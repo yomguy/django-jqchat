@@ -190,7 +190,7 @@ class AJAXPostTest(TestCase):
     def test_not_get(self):
         """If sending new data, we have to use a POST."""
 
-        response = self.client.get(reverse('jqchat_test_window', kwargs={'id': 1}), {'time': 0,
+        response = self.client.get(reverse('jqchat_ajax', kwargs={'id': 1}), {'time': 0,
                                                          'action': 'postmsg',
                                                          'message': 'rhubarb'})
         self.assert_(response.status_code == 400, response.status_code)
