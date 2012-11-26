@@ -8,6 +8,7 @@ from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
 #from django.conf import settings
+from django.core.urlresolvers import reverse
 
 import simplejson
 from models import Room, Message
@@ -30,7 +31,7 @@ class ChatPageTest(TestCase):
         """We have a basic test page for the chat client."""
 
         # Get the room defined in the fixture.
-        response = self.client.get('/jqchat/room/1/')
+        response = self.client.get(reverse('jqchat_test_window', kwargs={'id': 1}))
         self.assert_(response.status_code == 200, response.status_code)
 
         # Basic checks on the content of this page.
@@ -41,7 +42,7 @@ class ChatPageTest(TestCase):
         """Must be logged in to access the chat page."""
 
         self.client.logout()
-        response = self.client.get('/jqchat/room/1/')
+        response = self.client.get(reverse('jqchat_test_window', kwargs={'id': 1}))
         # Should redirect to login page.
         self.assert_(response.status_code == 302, response.status_code)
 
@@ -54,11 +55,11 @@ class AJAXGetTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.client.login(username='mickey', password='test')
-        
+
     def test_get_messages(self):
         """Get the latest messages."""
 
-        response = self.client.get('/jqchat/room/1/ajax/', {'time': 0})
+        response = self.client.get(reverse('jqchat_ajax', kwargs={'id': 1}), {'time': 0})
 
         # Basic sanity checks
         self.assert_(response.status_code == 200, response.status_code)
@@ -89,14 +90,14 @@ class AJAXGetTest(TestCase):
         """If the user is not logged in, they cannot access this method."""
 
         self.client.logout()
-        response = self.client.get('/jqchat/room/1/ajax/', {'time': 0})
+        response = self.client.get(reverse('jqchat_ajax', kwargs={'id': 1}), {'time': 0})
 
         self.assert_(response.status_code == 400, response.status_code)
 
     def test_get_last_message(self):
         """Set the time sent to the server so as to only retrieve the last message for room 1."""
 
-        response = self.client.get('/jqchat/room/1/ajax/', {'time': 1227629906})
+        response = self.client.get(reverse('jqchat_ajax', kwargs={'id': 1}), {'time': 1227629906})
 
         self.assert_(response.status_code == 200, response.status_code)
 
@@ -113,7 +114,7 @@ class AJAXGetTest(TestCase):
     def test_no_messages(self):
         """Set the time sent to the server to after the time of the most recent message."""
 
-        response = self.client.get('/jqchat/room/1/ajax/', {'time': 1227629910})
+        response = self.client.get(reverse('jqchat_ajax', kwargs={'id': 1}), {'time': 1227629910})
 
         self.assert_(response.status_code == 200, response.status_code)
 
@@ -127,7 +128,7 @@ class AJAXGetTest(TestCase):
     def test_no_time(self):
         """All requests should include the time."""
 
-        response = self.client.get('/jqchat/room/1/ajax/')
+        response = self.client.get(reverse('jqchat_ajax', kwargs={'id': 1}))
         self.assert_(response.status_code == 400, response.status_code)
 
     def test_room_2(self):
@@ -135,7 +136,7 @@ class AJAXGetTest(TestCase):
         Additionally, set the time so as to retrieve only the latest 2 messages in that room -
         the first message gets ignored."""
 
-        response = self.client.get('/jqchat/room/2/ajax/', {'time': 1227629877})
+        response = self.client.get(reverse('jqchat_ajax', kwargs={'id': 2}), {'time': 1227629877})
 
         self.assert_(response.status_code == 200, response.status_code)
 
@@ -163,7 +164,7 @@ class AJAXPostTest(TestCase):
     def test_post_message(self):
         """Post a new message to the server"""
 
-        response = self.client.post('/jqchat/room/1/ajax/', {'time': 0,
+        response = self.client.post(reverse('jqchat_ajax', kwargs={'id': 1}), {'time': 0,
                                                          'action': 'postmsg',
                                                          'message': 'rhubarb'})
         self.assert_(response.status_code == 200, response.status_code)
@@ -189,7 +190,7 @@ class AJAXPostTest(TestCase):
     def test_not_get(self):
         """If sending new data, we have to use a POST."""
 
-        response = self.client.get('/jqchat/room/1/ajax/', {'time': 0,
+        response = self.client.get(reverse('jqchat_ajax', kwargs={'id': 1}), {'time': 0,
                                                          'action': 'postmsg',
                                                          'message': 'rhubarb'})
         self.assert_(response.status_code == 400, response.status_code)
@@ -197,14 +198,14 @@ class AJAXPostTest(TestCase):
     def test_no_time(self):
         """All requests should include the time."""
 
-        response = self.client.get('/jqchat/room/1/ajax/', {'action': 'postmsg',
+        response = self.client.get(reverse('jqchat_ajax', kwargs={'id': 1}), {'action': 'postmsg',
                                                          'message': 'rhubarb'})
         self.assert_(response.status_code == 400, response.status_code)
 
     def test_empty_message(self):
         """Post an empty message to the server - it will be ignored."""
 
-        response = self.client.post('/jqchat/room/1/ajax/', {'time': 0,
+        response = self.client.post(reverse('jqchat_ajax', kwargs={'id': 1}), {'time': 0,
                                                          'action': 'postmsg',
                                                          'message': '  '})
         self.assert_(response.status_code == 200, response.status_code)
@@ -217,7 +218,7 @@ class AJAXPostTest(TestCase):
     def test_XSS(self):
         """Check that chat is protected against cross-site scripting (by disabling html tags)."""
 
-        response = self.client.post('/jqchat/room/1/ajax/', {'time': 0,
+        response = self.client.post(reverse('jqchat_ajax', kwargs={'id': 1}), {'time': 0,
                                                          'action': 'postmsg',
                                                          'message': '<script>alert("boo!");</script>'})
         self.assert_(response.status_code == 200, response.status_code)
@@ -242,7 +243,7 @@ class BehaviourTest(TestCase):
     def test_simultaneous_messages(self):
         """Ensure that messages sent by different users at (virtually) the same time are picked up."""
 
-        response = self.client.post('/jqchat/room/1/ajax/', {'time': 0,
+        response = self.client.post(reverse('jqchat_ajax', kwargs={'id': 1}), {'time': 0,
                                                          'action': 'postmsg',
                                                          'message': 'rhubarb'})
         self.assert_(response.status_code == 200, response.status_code)
@@ -259,7 +260,7 @@ class BehaviourTest(TestCase):
         self.assert_('rhubarb' in messages[-1]['text'])
 
         # Donald also sends a message, at virtually the same time.
-        response = self.client2.post('/jqchat/room/1/ajax/', {'time': 0,
+        response = self.client2.post(reverse('jqchat_ajax', kwargs={'id': 1}), {'time': 0,
                                                          'action': 'postmsg',
                                                          'message': 'crumble'})
         self.assert_(response.status_code == 200, response.status_code)
@@ -280,9 +281,9 @@ class BehaviourTest(TestCase):
         self.assert_('rhubarb' in messages[-2]['text'])
 
         # Mickey immediately requests the latest messages (it could happen...).
-        # Note how the time is no longer 0 - it's whatever time was returned from the 
+        # Note how the time is no longer 0 - it's whatever time was returned from the
         # last AJAX query.
-        response = self.client.get('/jqchat/room/1/ajax/', {'time': mickey_time})
+        response = self.client.get(reverse('jqchat_ajax', kwargs={'id': 1}), {'time': mickey_time})
         self.assert_(response.status_code == 200, response.status_code)
 
         payload = simplejson.loads(response.content)
@@ -313,8 +314,8 @@ class EventTest(TestCase):
         u = User.objects.get(username='mickey')
         r = Room.objects.get(id=1)
         Message.objects.create_event(u, r, 3)
-        
-        response = self.client.get('/jqchat/room/1/ajax/', {'time': 1227629906})
+
+        response = self.client.get(reverse('jqchat_ajax', kwargs={'id': 1}), {'time': 1227629906})
 
         self.assert_(response.status_code == 200, response.status_code)
 
@@ -336,7 +337,7 @@ class EventTest(TestCase):
 
 class DescriptionTest(TestCase):
     """Get and update the description field.
-    The description is only in the second test chat window, and is a demo of how to extend 
+    The description is only in the second test chat window, and is a demo of how to extend
     the chat system.
     """
 
@@ -349,7 +350,7 @@ class DescriptionTest(TestCase):
     def test_get_description(self):
         """For room 1, there is no description."""
 
-        response = self.client.get('/jqchat/room_with_description/1/ajax/', {'time': 0})
+        response = self.client.get(reverse('jqchat_test_window_with_description_ajax', kwargs={'id': 1}), {'time': 0})
         self.assert_(response.status_code == 200, response.status_code)
         payload = simplejson.loads(response.content)
         self.assert_(payload.has_key('description') == False)
@@ -357,7 +358,7 @@ class DescriptionTest(TestCase):
     def test_get_description2(self):
         """room 2 has a pre-canned description."""
 
-        response = self.client.get('/jqchat/room_with_description/2/ajax/', {'time': 0})
+        response = self.client.get(reverse('jqchat_test_window_with_description_ajax', kwargs={'id': 2}), {'time': 0})
         self.assert_(response.status_code == 200, response.status_code)
         payload = simplejson.loads(response.content)
         self.assert_(payload['description'] == 'Enter description here!', payload)
@@ -366,7 +367,7 @@ class DescriptionTest(TestCase):
     def test_change_description(self):
         """Change the description for room 2."""
 
-        response = self.client.post('/jqchat/room_with_description/2/ajax/', {'time': 0,
+        response = self.client.post(reverse('jqchat_test_window_with_description_ajax', kwargs={'id': 2}), {'time': 0,
                                                                             'action': 'change_description',
                                                                             'description': 'A new description'})
         self.assert_(response.status_code == 200, response.status_code)
@@ -387,7 +388,7 @@ class DescriptionTest(TestCase):
     def test_XSS(self):
         """Check that chat is protected against cross-site scripting (by disabling html tags)."""
 
-        response = self.client.post('/jqchat/room_with_description/2/ajax/', {'time': 0,
+        response = self.client.post(reverse('jqchat_test_window_with_description_ajax', kwargs={'id': 2}), {'time': 0,
                                                                             'action': 'change_description',
                                                                             'description': '<script>alert("boo!");</script>'})
         self.assert_(response.status_code == 200, response.status_code)
