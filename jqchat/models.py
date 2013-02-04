@@ -79,7 +79,7 @@ class Room(models.Model):
 # The list of events can be customised for each project.
 try:
     EVENT_CHOICES = settings.JQCHAT_EVENT_CHOICES
-except:
+except AttributeError:
     # Use default event list.
     EVENT_CHOICES = (
                   (1, "has changed the room's description."),
