@@ -40,11 +40,9 @@ $(document).ajaxSend(function(event, xhr, settings) {
 });
 
 
-jQuery.fn.urlize = function( base ) {
-    var x = this.html();
+var urlize = function(text) {
     var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-    var text = x.replace(exp,"<a href='$1'>$1</a>");
-    this.html(text);
+    return text.replace(exp,"<a href='$1'>$1</a>");
 };
 
 // Chat client code.
@@ -81,7 +79,7 @@ function processResponse(payload) {
 	// Get the timestamp, store it in global variable to be passed to the server on next call.
 	timestamp = payload.time;
 	for(message in payload.messages) {
-		$("#chatwindow").append(payload.messages[message].text).urlize( "/" );
+		$("#chatwindow").append(urlize(payload.messages[message].text));
 	}
 	// Scroll down if messages fill up the div.
 	var objDiv = document.getElementById("chatwindow");
