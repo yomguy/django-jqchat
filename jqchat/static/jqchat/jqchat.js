@@ -42,13 +42,9 @@ $(document).ajaxSend(function(event, xhr, settings) {
 
 jQuery.fn.urlize = function( base ) {
     var x = this.html();
-    list = x.match( /\b(http:\/\/|www\.|http:\/\/www\.)[^ ]{2,100}\b/g );
-    if ( list ) {
-        for ( i = 0; i < list.length; i++ ) {
-            x = x.replace( list[i], "<a href='" + base + escape( list[i] ) + "'>"+ list[i] + "</a>" );
-        }
-        this.html(x);
-    }
+    var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    var text = x.replace(exp,"<a href='$1'>$1</a>");
+    this.html(text);
 };
 
 // Chat client code.
