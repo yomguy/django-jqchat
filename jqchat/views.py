@@ -16,6 +16,13 @@ except AttributeError:
     # Use default format.
     DATE_FORMAT = "D-H:i:s"
 
+# Time in hours over which the messages will not be displayed
+try:
+    JQCHAT_DISPLAY_TIME = settings.JQCHAT_DISPLAY_TIME
+except AttributeError:
+    JQCHAT_DISPLAY_TIME = 0
+
+
 # How many messages to retrieve at most.
 JQCHAT_DISPLAY_COUNT = getattr(settings, 'JQCHAT_DISPLAY_COUNT', 100)
 
@@ -116,6 +123,11 @@ class Ajax(object):
         # Get new messages - do this last in case the ExtraHandling has itself generated
         # new messages.
         NewMessages = self.ThisRoom.message_set.filter(unix_timestamp__gt=self.request_time)
+
+        if JQCHAT_DISPLAY_TIME:
+            min_unix_timestamp = time.time() - JQCHAT_DISPLAY_TIME*3600
+            NewMessages = NewMessages.filter(unix_timestamp__gt=min_unix_timestamp)
+
         if NewMessages:
             StatusCode = 1
 
