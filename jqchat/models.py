@@ -33,7 +33,7 @@ class Room(models.Model):
     True
 
     """
-    name = models.CharField(max_length=20, null=True, blank=True, help_text='Name of the room.')
+    name = models.CharField(max_length=255, null=True, blank=True, help_text='Name of the room.')
     created = models.DateTimeField(editable=False)
     description = models.CharField(max_length=100, null=True, blank=True, help_text='The description of this room.')
     description_modified = models.IntegerField(null=True, editable=False, help_text='Unix timestamp when the description was created or last modified.')
