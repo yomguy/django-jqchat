@@ -16,15 +16,11 @@ except AttributeError:
     # Use default format.
     DATE_FORMAT = "D-H:i:s"
 
-# Time in hours over which the messages will not be displayed
-try:
-    JQCHAT_DISPLAY_TIME = settings.JQCHAT_DISPLAY_TIME
-except AttributeError:
-    JQCHAT_DISPLAY_TIME = 0
-
-
 # How many messages to retrieve at most.
 JQCHAT_DISPLAY_COUNT = getattr(settings, 'JQCHAT_DISPLAY_COUNT', 100)
+
+# Time in hours over which the messages will not be displayed
+JQCHAT_DISPLAY_TIME = getattr(settings, 'JQCHAT_DISPLAY_TIME', 0)
 
 #------------------------------------------------------------------------------
 @login_required
