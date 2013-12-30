@@ -14,6 +14,7 @@ setup(
     description='An extensible instant messanger thingy for Django',
     packages=find_packages(),
     include_package_data=True,
+    zip_safe = False,
     classifiers=[
         "Framework :: Django",
         "Intended Audience :: Developers",
