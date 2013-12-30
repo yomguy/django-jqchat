@@ -1,0 +1,6 @@
+include README.rst
+recursive-include docs *
+recursive-include jqchat *
+global-exclude *.pyc
+prune dist
+prune build
