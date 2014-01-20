@@ -11,7 +11,7 @@ setup(
         'django-timezones',
         'pytz',
         ],
-    description='An extensible instant messanger thingy for Django',
+    description='An extensible instant messenger thingy for Django',
     packages=find_packages(),
     include_package_data=True,
     zip_safe = False,
